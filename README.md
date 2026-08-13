@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GRIND
 
-## Getting Started
+Sistema pessoal de organização e progressão com gramática de RPG. Um lugar só para
+hábitos, missões, habilidades e pendências.
 
-First, run the development server:
+- **Spec conceitual:** [`grind.md`](./grind.md) — fonte da verdade das regras. Toda decisão
+  de produto sai de lá, e as referências `§` no código apontam para as seções dela.
+- **Plano de execução:** [`PLANO.md`](./PLANO.md) — as 10 etapas desta construção.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Como funciona, em um parágrafo
+
+Seis **Pulsos** (hábitos diários) e **Sessões** de trabalho geram XP. Todo XP credita duas
+contas ao mesmo tempo: o total, que move a **classe** (8 degraus, de `F` Diletante a `SS`
+Polímata), e a **disciplina** de origem (`CMP` `MAT` `COR` `ART` `MUS` `MND`). Ao bater o
+teto da classe o XP para de acumular: sair de lá exige uma **Missão de Avanço**, uma
+entrega real, e só depois de satisfeita a **Prova de Amplitude** — N disciplinas acima de
+um nível. É a regra que impede virar mono-classe.
+
+## Arquitetura em uma decisão
+
+**O banco guarda evento, nunca saldo.**
+
+```
+pulse_log · checkin_log · session_log · node · mission · reward
+                        │
+                        ▼
+                   derive.ts  ← XP, streak, Ω, nível, classe
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+XP total, streak, contador `Ω` e nível de disciplina são todos derivados dos eventos a cada
+carga. Nenhum contador é incrementado à mão, que é onde esse tipo de sistema sempre
+dessincroniza. E como os valores de XP são v0 (§12), recalibrar é editar
+`src/lib/grind/spec.ts`: o histórico inteiro recalcula sozinho.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Camada | Escolha |
+|---|---|
+| Front | Next.js 16 (App Router) · React 19 · Tailwind v4 |
+| Dados | Supabase (Postgres + Auth magic link, RLS por usuário) |
+| Notificação | ntfy.sh, disparado por timer systemd |
+| Testes | `node --test` sobre a derivação de XP (sem dependência extra) |
 
-## Learn More
+Identidade visual: tema **Stratus**, com o desvio documentado na §10.1 da spec — canto reto
+em tudo e mono (Victor Mono) como fonte dominante.
 
-To learn more about Next.js, take a look at the following resources:
+## Rodar local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+cp .env.example .env.local   # preencher com as chaves do Supabase
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Script | O que faz |
+|---|---|
+| `npm run dev` | servidor de desenvolvimento |
+| `npm test` | testes da derivação de XP |
+| `npm run lint` | eslint |
+| `npm run build` | build de produção |
 
-## Deploy on Vercel
+## Estado da construção
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Etapa | Status |
+|---|---|
+| 0 · Fundação, tokens Stratus, fontes | ✅ |
+| 1 · Supabase: schema, RLS, auth | ⬜ |
+| 2 · Núcleo de domínio + testes | ⬜ |
+| 3 · FICHA + check-in · **primeiro deploy** | ⬜ |
+| 4 · GRID + Jornada do Vazio | ⬜ |
+| 5 · ÁRVORE de habilidades | ⬜ |
+| 6 · MISSÕES | ⬜ |
+| 7 · INVENTÁRIO | ⬜ |
+| 8 · Notificações ntfy + systemd | ⬜ |
+| 9 · Fechamento | ⬜ |
