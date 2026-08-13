@@ -11,7 +11,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * o cookie renovado na resposta.
  */
 
-const PUBLICAS = ["/entrar", "/auth"];
+const PUBLICAS = ["/entrar"];
 
 export async function proxy(request: NextRequest) {
   let resposta = NextResponse.next({ request });
