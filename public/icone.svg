@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!--
+    Ícone do GRIND. Não é o cloud mark do Stratus: aquele é a marca pessoal,
+    este é um produto dentro dela. Grid explícito e canto reto (§10.1), com a
+    célula preenchida em accent.primary — a mesma gramática do check-in.
+  -->
+  <rect width="64" height="64" fill="#0C1018"/>
+  <g fill="none" stroke="#293849" stroke-width="2">
+    <rect x="9" y="9" width="20" height="20"/>
+    <rect x="35" y="9" width="20" height="20"/>
+    <rect x="9" y="35" width="20" height="20"/>
+    <rect x="35" y="35" width="20" height="20"/>
+  </g>
+  <rect x="9" y="9" width="20" height="20" fill="#6BA3E8"/>
+  <rect x="35" y="35" width="20" height="20" fill="#293849"/>
+</svg>

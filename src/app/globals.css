@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * Tokens Stratus.
+ * Fonte da verdade: ~/10-19_dev/11_pessoal/11.06_visual-identity/design-system.md
+ * Mapeamento semântico para o GRIND: §10.2 da spec.
+ *
+ * Regra herdada do design system: nunca usar hex raw fora deste bloco.
+ */
+@theme {
+  --color-fundo: #0c1018;
+  --color-superficie: #131b28;
+  --color-elevado: #1b2637;
+  --color-borda: #293849;
+
+  --color-texto: #c8d4e3;
+  --color-texto-secundario: #7a90a8;
+  --color-texto-apagado: #4a5a70;
+
+  --color-acento: #6ba3e8;
+  --color-vazio: #8b6fbe;
+  --color-destaque: #45c4c4;
+
+  --color-sucesso: #7abf8a;
+  --color-alerta: #e0b84a;
+  --color-erro: #cc6070;
+
+  --font-mono: var(--font-mono-victor), ui-monospace, monospace;
+  --font-display: var(--font-geist), system-ui, sans-serif;
+
+  /* §10.1: o GRIND inverte o design system e usa canto reto em tudo. */
+  --radius-sharp: 0px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-radius: var(--radius-sharp);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fundo);
+  color: var(--color-texto);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+/* Alto contraste de borda é o elemento estrutural da identidade (§10). */
+.quadro {
+  border: 1px solid var(--color-borda);
+  background: var(--color-superficie);
+}
+
+/**
+ * Título de seção em caixa alta, o rótulo que abre todo quadro do sistema.
+ * Aparece em todas as abas; sem isto seria a duplicação mais repetida do CSS.
+ */
+.rotulo {
+  color: var(--color-texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+}
+
+/**
+ * "Layout rígido, movimento fluido" (§10): a estrutura não se move, o estado
+ * transiciona. Uma curva só para o sistema inteiro, senão cada componente
+ * inventa a sua e o conjunto perde unidade.
+ */
+.transicao {
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out,
+    color 140ms ease-out,
+    opacity 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transicao {
+    transition: none;
+  }
 }
