@@ -65,7 +65,7 @@ export async function carregarTudo(supabase: SupabaseClient, userId: string): Pr
     supabase.from("profile").select("inicio, enfases").eq("user_id", userId).maybeSingle(),
     supabase.from("checkin_log").select("dia"),
     supabase.from("pulse_log").select("dia, pulso, disciplina"),
-    supabase.from("session_log").select("dia, tipo, disciplina, minutos"),
+    supabase.from("session_log").select("id, dia, tipo, disciplina, minutos"),
     supabase.from("node_unlock").select("no_id, destravado_em"),
     supabase
       .from("mission")

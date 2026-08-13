@@ -17,7 +17,14 @@
 import { createContext, createElement, useCallback, useContext, useMemo, useState } from "react";
 import { clienteNavegador } from "@/lib/supabase/cliente";
 import { concluidas, type Dados } from "./consultas";
-import { derivarEstado, hoje, type Dia, type Estado, type Eventos } from "./derive";
+import {
+  derivarEstado,
+  hoje,
+  type Dia,
+  type Estado,
+  type EventoSessao,
+  type Eventos,
+} from "./derive";
 import type { Disciplina, PulsoId } from "./spec";
 
 type Escrita = () => PromiseLike<{ error: { message: string } | null }>;
@@ -31,6 +38,8 @@ type Contexto = {
   otimista: (proximos: Dados, escrever: Escrita) => Promise<void>;
   alternarPulso: (pulso: PulsoId, disciplina: Disciplina, dia?: Dia) => Promise<void>;
   registrarCheckin: (dia?: Dia) => Promise<void>;
+  registrarSessao: (sessao: Omit<EventoSessao, "id">) => Promise<void>;
+  removerSessao: (id: number) => Promise<void>;
 };
 
 const ContextoEventos = createContext<Contexto | null>(null);
@@ -94,7 +103,57 @@ function useEstadoInterno(iniciais: Dados): Contexto {
     [dados, otimista, supabase],
   );
 
-  return { dados, eventos: dados.eventos, estado, erro, otimista, alternarPulso, registrarCheckin };
+  /**
+   * Sessão não é otimista: o id vem do banco e é o que permite apagá-la
+   * depois. Digitar minutos num formulário já custa segundos, então esperar a
+   * resposta não muda a sensação de uso — ao contrário de marcar um Pulso.
+   */
+  const registrarSessao = useCallback(
+    async (sessao: Omit<EventoSessao, "id">) => {
+      setErro(null);
+      const { data, error } = await supabase.from("session_log").insert(sessao).select("id").single();
+
+      if (error) {
+        setErro(error.message);
+        return;
+      }
+
+      setDados((atuais) => ({
+        ...atuais,
+        eventos: { ...atuais.eventos, sessoes: [...atuais.eventos.sessoes, { ...sessao, id: data.id }] },
+      }));
+    },
+    [supabase],
+  );
+
+  const removerSessao = useCallback(
+    async (id: number) => {
+      const anteriores = dados;
+      setDados({
+        ...dados,
+        eventos: { ...dados.eventos, sessoes: dados.eventos.sessoes.filter((s) => s.id !== id) },
+      });
+
+      const { error } = await supabase.from("session_log").delete().eq("id", id);
+      if (error) {
+        setDados(anteriores);
+        setErro(error.message);
+      }
+    },
+    [dados, supabase],
+  );
+
+  return {
+    dados,
+    eventos: dados.eventos,
+    estado,
+    erro,
+    otimista,
+    alternarPulso,
+    registrarCheckin,
+    registrarSessao,
+    removerSessao,
+  };
 }
 
 export function ProvedorEventos({
