@@ -65,9 +65,9 @@ npm run dev
 | Etapa | Status |
 |---|---|
 | 0 · Fundação, tokens Stratus, fontes | ✅ |
-| 1 · Supabase: schema, RLS, auth | ⬜ |
-| 2 · Núcleo de domínio + testes | ⬜ |
-| 3 · FICHA + check-in · **primeiro deploy** | ⬜ |
+| 1 · Supabase: schema, RLS, auth | ✅ |
+| 2 · Núcleo de domínio + testes | ✅ |
+| 3 · FICHA + check-in · **primeiro deploy** | ✅ |
 | 4 · GRID + Jornada do Vazio | ⬜ |
 | 5 · ÁRVORE de habilidades | ⬜ |
 | 6 · MISSÕES | ⬜ |
