@@ -206,6 +206,23 @@ export const XP_MISSAO: Record<TipoMissao, number> = {
   resgate: 0,
 };
 
+/**
+ * Missão de Avanço ativa da classe 1 (§2.5). Semeada no primeiro acesso, porque
+ * um sistema que abre sem missão definida convida a acumular XP sem entregar
+ * nada — que é exatamente o que o teto existe para impedir.
+ */
+export const MISSAO_AVANCO_CLASSE_1 = {
+  titulo: "Construir e publicar um site de portfólio",
+  criterios: [
+    "site no ar, em domínio próprio, fora do localhost",
+    "tokens Stratus aplicados (§10.2), responsivo",
+    "3+ projetos, cada um com problema, decisão técnica e resultado",
+    "link para GitHub e LinkedIn",
+    "pt-BR e en completos, com troca de idioma no site",
+    "enviado em pelo menos 1 candidatura real (uma em cada idioma)",
+  ],
+} as const;
+
 /** Tiers de recompensa do Inventário e sua condição de destrave (§8). */
 export const TIERS_RECOMPENSA = [
   { id: "micro", nome: "Micro", condicao: "3 dias seguidos" },
