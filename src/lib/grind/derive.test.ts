@@ -11,12 +11,15 @@ import assert from "node:assert/strict";
 
 import {
   derivarEstado,
+  distribuicaoDoPulso,
   ganhosDoDia,
   intervaloDeDias,
   multiplicadorStreak,
   nivelDisciplina,
   provaDeAmplitude,
   semanaPerfeita,
+  somarDias,
+  streakDoPulso,
   xpBaseDoDia,
   type Eventos,
 } from "./derive";
@@ -58,6 +61,50 @@ function semanaCheia(segunda: string, disciplina: Disciplina = "CMP") {
     missoes: [{ id: `sem-${segunda}`, tipo: "semanal" as const, dia: dias[3] }],
   };
 }
+
+// ---------------------------------------------------------------- pulso a pulso
+
+test("streak do Pulso conta dias seguidos e para no primeiro buraco", () => {
+  const e = eventos({
+    pulsos: [SEGUNDA, somarDias(SEGUNDA, 2), somarDias(SEGUNDA, 3)].map((dia) => ({
+      dia,
+      pulso: "leitura" as const,
+      disciplina: "CMP" as const,
+    })),
+  });
+
+  assert.equal(streakDoPulso(e, "leitura", somarDias(SEGUNDA, 3)), 2);
+  assert.equal(streakDoPulso(e, "escrita", somarDias(SEGUNDA, 3)), 0);
+});
+
+test("dia corrente ainda não marcado não quebra a streak do Pulso", () => {
+  const e = eventos({
+    pulsos: [SEGUNDA, somarDias(SEGUNDA, 1)].map((dia) => ({
+      dia,
+      pulso: "leitura" as const,
+      disciplina: "CMP" as const,
+    })),
+  });
+
+  assert.equal(streakDoPulso(e, "leitura", somarDias(SEGUNDA, 2)), 2);
+});
+
+test("distribuição do Pulso vem da mais frequente para a menos", () => {
+  const e = eventos({
+    pulsos: [
+      { dia: SEGUNDA, pulso: "estudo", disciplina: "CMP" },
+      { dia: somarDias(SEGUNDA, 1), pulso: "estudo", disciplina: "CMP" },
+      { dia: somarDias(SEGUNDA, 2), pulso: "estudo", disciplina: "MAT" },
+      { dia: SEGUNDA, pulso: "leitura", disciplina: "MND" },
+    ],
+  });
+
+  assert.deepEqual(distribuicaoDoPulso(e, "estudo"), [
+    { disciplina: "CMP", total: 2 },
+    { disciplina: "MAT", total: 1 },
+  ]);
+  assert.deepEqual(distribuicaoDoPulso(e, "desenho"), []);
+});
 
 // ---------------------------------------------------------------- dia
 

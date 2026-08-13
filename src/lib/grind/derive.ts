@@ -35,7 +35,14 @@ export type Dia = string;
 
 export type EventoPulso = { dia: Dia; pulso: PulsoId; disciplina: Disciplina };
 export type EventoCheckin = { dia: Dia };
-export type EventoSessao = { dia: Dia; tipo: SessaoId; disciplina: Disciplina; minutos: number };
+export type EventoSessao = {
+  dia: Dia;
+  tipo: SessaoId;
+  disciplina: Disciplina;
+  minutos: number;
+  /** Chave da linha em `session_log`. Só existe para o que veio do banco. */
+  id?: number;
+};
 export type EventoNo = { no: string; dia: Dia };
 export type EventoMissao = { id: string; tipo: TipoMissao; dia: Dia };
 
@@ -117,6 +124,44 @@ export function diaVazio(eventos: Eventos, dia: Dia): boolean {
     pulsosDoDia(eventos, dia).length === 0 &&
     !eventos.sessoes.some((s) => s.dia === dia)
   );
+}
+
+// ---------------------------------------------------------------- pulso a pulso
+
+/**
+ * Dias seguidos com um Pulso marcado (§6.3). Cada Pulso tem a sua, além da
+ * streak semanal da barra.
+ *
+ * O dia corrente ainda não marcado não quebra a contagem — pela mesma razão
+ * que ele não conta para o Ω: o dia não acabou.
+ */
+export function streakDoPulso(eventos: Eventos, pulso: PulsoId, ate: Dia = hoje()): number {
+  const marcados = new Set(eventos.pulsos.filter((p) => p.pulso === pulso).map((p) => p.dia));
+
+  let dia = marcados.has(ate) ? ate : somarDias(ate, -1);
+  let total = 0;
+  while (dia >= eventos.inicio && marcados.has(dia)) {
+    total += 1;
+    dia = somarDias(dia, -1);
+  }
+  return total;
+}
+
+/**
+ * Em que disciplinas um Pulso caiu, da mais frequente para a menos. É a
+ * pergunta de amplitude da §6.3: "marquei sempre no mesmo lugar?".
+ */
+export function distribuicaoDoPulso(
+  eventos: Eventos,
+  pulso: PulsoId,
+): { disciplina: Disciplina; total: number }[] {
+  const contagem = new Map<Disciplina, number>();
+  for (const p of eventos.pulsos) {
+    if (p.pulso === pulso) contagem.set(p.disciplina, (contagem.get(p.disciplina) ?? 0) + 1);
+  }
+  return [...contagem]
+    .map(([disciplina, total]) => ({ disciplina, total }))
+    .sort((a, b) => b.total - a.total);
 }
 
 // ---------------------------------------------------------------- ganhos
