@@ -61,6 +61,25 @@ body {
 }
 
 /**
+ * Entrada de formulário. Select e input nativos, sem estilo de plataforma:
+ * o sistema é um terminal e um dropdown arredondado quebraria a identidade.
+ */
+.campo {
+  appearance: none;
+  border: 1px solid var(--color-borda);
+  background: var(--color-fundo);
+  color: var(--color-texto);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.campo:focus {
+  outline: none;
+  border-color: var(--color-acento);
+}
+
+/**
  * "Layout rígido, movimento fluido" (§10): a estrutura não se move, o estado
  * transiciona. Uma curva só para o sistema inteiro, senão cada componente
  * inventa a sua e o conjunto perde unidade.
