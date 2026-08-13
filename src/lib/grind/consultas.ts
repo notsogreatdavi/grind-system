@@ -9,7 +9,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { hoje, type Eventos } from "./derive";
-import { MISSAO_AVANCO_CLASSE_1, type EnfaseId } from "./spec";
+import type { EnfaseId } from "./spec";
 
 export type Missao = {
   id: string;
@@ -30,8 +30,12 @@ export type Recompensa = {
 };
 
 /**
- * Primeiro acesso: cria o perfil e a Missão de Avanço da classe 1 (§2.5).
+ * Primeiro acesso: cria o perfil, que é a origem do contador Ω.
  * Idempotente — roda a cada carga e não duplica nada.
+ *
+ * A Missão de Avanço não é semeada aqui. Ela é conteúdo do usuário, não spec,
+ * e a §2.4 exige que seja escrita e datada por ele antes de começar. Escrevê-la
+ * na aba MISSÕES mantém o repositório sem nada pessoal dentro.
  */
 export async function garantirPerfil(supabase: SupabaseClient, userId: string) {
   const { data: perfil } = await supabase
@@ -43,12 +47,6 @@ export async function garantirPerfil(supabase: SupabaseClient, userId: string) {
   if (perfil) return;
 
   await supabase.from("profile").insert({ user_id: userId, inicio: hoje() });
-  await supabase.from("mission").insert({
-    user_id: userId,
-    tipo: "avanco",
-    titulo: MISSAO_AVANCO_CLASSE_1.titulo,
-    criterios: MISSAO_AVANCO_CLASSE_1.criterios.map((texto) => ({ texto, feito: false })),
-  });
 }
 
 export type Dados = {

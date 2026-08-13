@@ -32,6 +32,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# documentos pessoais e de trabalho com agente — nunca no repositório público
+grind.md
+PLANO.md
+CLAUDE.md
+AGENTS.md
+.claude/
 
 # vercel
 .vercel
@@ -39,4 +47,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-!.env.example

@@ -3,9 +3,8 @@
 Sistema pessoal de organização e progressão com gramática de RPG. Um lugar só para
 hábitos, missões, habilidades e pendências.
 
-- **Spec conceitual:** [`grind.md`](./grind.md) — fonte da verdade das regras. Toda decisão
-  de produto sai de lá, e as referências `§` no código apontam para as seções dela.
-- **Plano de execução:** [`PLANO.md`](./PLANO.md) — as 10 etapas desta construção.
+As referências `§` espalhadas pelos comentários do código apontam para a spec conceitual do
+sistema, que fica fora deste repositório junto com as anotações pessoais que a originaram.
 
 ---
 
