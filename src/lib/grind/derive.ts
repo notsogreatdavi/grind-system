@@ -27,6 +27,7 @@ import {
   type EnfaseId,
   type PulsoId,
   type SessaoId,
+  type TierRecompensa,
   type TipoMissao,
 } from "./spec";
 
@@ -309,6 +310,60 @@ export function streakSemanas(eventos: Eventos, ate: Dia = hoje()): number {
     semana = somarDias(semana, -7);
   }
   return total;
+}
+
+// ---------------------------------------------------------------- inventário
+
+/**
+ * Blocos de 3 dias seguidos já fechados no histórico inteiro (§8, tier Micro).
+ *
+ * Conta blocos, não a sequência atual: 9 dias seguidos valem três recompensas Micro,
+ * e não uma. A condição é repetível, então o crédito também é.
+ */
+function blocosDeTresDias(eventos: Eventos, ate: Dia): number {
+  let seguidos = 0;
+  let blocos = 0;
+
+  for (const dia of eventos.inicio ? intervaloDeDias(eventos.inicio, ate) : []) {
+    // O dia corrente ainda vazio não quebra nada: ele não acabou (mesma regra do Ω).
+    if (dia === ate && diaVazio(eventos, dia)) break;
+
+    seguidos = diaVazio(eventos, dia) ? 0 : seguidos + 1;
+    if (seguidos === 3) {
+      blocos += 1;
+      seguidos = 0;
+    }
+  }
+
+  return blocos;
+}
+
+/** Todas as semanas perfeitas do histórico, não só as consecutivas da streak. */
+export function semanasPerfeitas(eventos: Eventos, ate: Dia = hoje()): number {
+  return semanasDoPeriodo(eventos.inicio, ate).filter((s) => semanaPerfeita(eventos, s, ate)).length;
+}
+
+/**
+ * Quantas recompensas de cada tier o histórico já pagou (§8). O que o Inventário
+ * mostra é isto menos o que já foi destravado — nada aqui olha para a tabela `reward`,
+ * porque a condição é do sistema e a recompensa é do usuário.
+ *
+ * Semana perfeita conta duas vezes de propósito: uma para o tier Pequena e, a cada
+ * duas, uma para o tier Média. É o que a tabela da §8 diz, literalmente.
+ */
+export function creditosDeRecompensa(
+  eventos: Eventos,
+  ate: Dia = hoje(),
+): Record<TierRecompensa, number> {
+  const perfeitas = semanasPerfeitas(eventos, ate);
+  const tier3 = eventos.nos.filter((n) => TIER_DO_NO.get(n.no)?.tier === 3).length;
+
+  return {
+    micro: blocosDeTresDias(eventos, ate),
+    pequena: perfeitas,
+    media: Math.floor(perfeitas / 2) + tier3,
+    grande: eventos.missoes.filter((m) => m.tipo === "avanco").length,
+  };
 }
 
 // ---------------------------------------------------------------- níveis
