@@ -70,7 +70,7 @@ npm run dev
 | 3 · FICHA + check-in · **primeiro deploy** | ✅ |
 | 4 · GRID + Jornada do Vazio | ✅ |
 | 5 · ÁRVORE de habilidades | ✅ |
-| 6 · MISSÕES | ⬜ |
+| 6 · MISSÕES | ✅ |
 | 7 · INVENTÁRIO | ⬜ |
 | 8 · Notificações ntfy + systemd | ⬜ |
 | 9 · Fechamento | ⬜ |
