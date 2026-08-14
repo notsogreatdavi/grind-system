@@ -13,8 +13,10 @@ import { MARCOS_VAZIO } from "@/lib/grind/spec";
 export function JornadaDoVazio({ segunda }: { segunda: string }) {
   const { eventos, estado } = useEventos();
 
+  // Dia anterior ao início do sistema não é dia perdido: ele não existe para o GRIND.
+  // Mesma regra que `derivarEstado` e `semanaPerfeita` já aplicam ao Ω e à semana.
   const perdidosNaSemana = intervaloDeDias(segunda, somarDias(segunda, 6)).filter(
-    (dia) => dia < estado.ate && diaVazio(eventos, dia),
+    (dia) => dia >= eventos.inicio && dia < estado.ate && diaVazio(eventos, dia),
   ).length;
 
   const proximo = [...MARCOS_VAZIO].reverse().find((marco) => marco.dias > estado.omega);
