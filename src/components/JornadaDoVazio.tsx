@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { diaVazio, intervaloDeDias, somarDias } from "@/lib/grind/derive";
 import { useEventos } from "@/lib/grind/store";
 import { MARCOS_VAZIO } from "@/lib/grind/spec";
@@ -56,8 +57,16 @@ export function JornadaDoVazio({ segunda }: { segunda: string }) {
       <p className="mt-2 text-xs text-texto-apagado">
         Dia perdido é dia ausente, não dia fraco. O custo de falhar é velocidade, nunca
         posição: nada aqui tira rank, XP ou recompensa já destravada.
-        {estado.debuff.nome && " Uma Missão de Resgate remove um marco — escreva-a em MISSÕES."}
       </p>
+
+      {estado.debuff.nome && (
+        <Link
+          href="/missoes"
+          className="transicao mt-2 inline-block border border-vazio px-2 py-1 text-xs text-vazio hover:bg-vazio hover:text-fundo"
+        >
+          escrever Missão de Resgate
+        </Link>
+      )}
     </section>
   );
 }
