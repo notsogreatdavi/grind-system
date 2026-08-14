@@ -16,7 +16,7 @@
 
 import { createContext, createElement, useCallback, useContext, useMemo, useState } from "react";
 import { clienteNavegador } from "@/lib/supabase/cliente";
-import { concluidas, type Dados, type Missao } from "./consultas";
+import { concluidas, type Dados, type Missao, type Recompensa } from "./consultas";
 import {
   derivarEstado,
   hoje,
@@ -46,6 +46,10 @@ type Contexto = {
   concluirMissao: (id: string) => Promise<void>;
   alternarCriterio: (id: string, indice: number) => Promise<void>;
   excluirMissao: (id: string) => Promise<void>;
+  criarRecompensa: (recompensa: Pick<Recompensa, "tier" | "nome">) => Promise<void>;
+  destravarRecompensa: (id: string) => Promise<void>;
+  resgatarRecompensa: (id: string) => Promise<void>;
+  excluirRecompensa: (id: string) => Promise<void>;
 };
 
 const ContextoEventos = createContext<Contexto | null>(null);
@@ -252,6 +256,62 @@ function useEstadoInterno(iniciais: Dados): Contexto {
     [dados, otimista, supabase],
   );
 
+  /**
+   * A recompensa é escrita ANTES de a condição ser batida (§8, regra 1), senão o
+   * cérebro renegocia o prêmio depois de saber que ganhou.
+   */
+  const criarRecompensa = useCallback(
+    async (recompensa: Pick<Recompensa, "tier" | "nome">) => {
+      setErro(null);
+      const { data, error } = await supabase
+        .from("reward")
+        .insert(recompensa)
+        .select("id, tier, nome, destravada_em, resgatada_em")
+        .single();
+
+      if (error) {
+        setErro(error.message);
+        return;
+      }
+
+      setDados((atuais) => ({ ...atuais, recompensas: [...atuais.recompensas, data] }));
+    },
+    [supabase],
+  );
+
+  const alterarRecompensa = useCallback(
+    async (id: string, mudanca: Partial<Recompensa>) => {
+      const recompensas = dados.recompensas.map((r) => (r.id === id ? { ...r, ...mudanca } : r));
+
+      await otimista({ ...dados, recompensas }, () =>
+        supabase.from("reward").update(mudanca).eq("id", id),
+      );
+    },
+    [dados, otimista, supabase],
+  );
+
+  const destravarRecompensa = useCallback(
+    (id: string) => alterarRecompensa(id, { destravada_em: hoje() }),
+    [alterarRecompensa],
+  );
+
+  const resgatarRecompensa = useCallback(
+    (id: string) => alterarRecompensa(id, { resgatada_em: hoje() }),
+    [alterarRecompensa],
+  );
+
+  /** Só recompensa ainda bloqueada se apaga: destravada não expira nem volta (§8, regra 2). */
+  const excluirRecompensa = useCallback(
+    async (id: string) => {
+      if (dados.recompensas.find((r) => r.id === id)?.destravada_em) return;
+
+      await otimista({ ...dados, recompensas: dados.recompensas.filter((r) => r.id !== id) }, () =>
+        supabase.from("reward").delete().eq("id", id),
+      );
+    },
+    [dados, otimista, supabase],
+  );
+
   return {
     dados,
     eventos: dados.eventos,
@@ -267,6 +327,10 @@ function useEstadoInterno(iniciais: Dados): Contexto {
     concluirMissao,
     alternarCriterio,
     excluirMissao,
+    criarRecompensa,
+    destravarRecompensa,
+    resgatarRecompensa,
+    excluirRecompensa,
   };
 }
 
