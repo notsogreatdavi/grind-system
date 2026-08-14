@@ -20,6 +20,7 @@ import { concluidas, type Dados } from "./consultas";
 import {
   derivarEstado,
   hoje,
+  noDisponivel,
   type Dia,
   type Estado,
   type EventoSessao,
@@ -40,6 +41,7 @@ type Contexto = {
   registrarCheckin: (dia?: Dia) => Promise<void>;
   registrarSessao: (sessao: Omit<EventoSessao, "id">) => Promise<void>;
   removerSessao: (id: number) => Promise<void>;
+  destravarNo: (noId: string) => Promise<void>;
 };
 
 const ContextoEventos = createContext<Contexto | null>(null);
@@ -143,6 +145,24 @@ function useEstadoInterno(iniciais: Dados): Contexto {
     [dados, supabase],
   );
 
+  /**
+   * Destravar é irreversível de propósito (§7.2): nada no código apaga progresso.
+   * A guarda é a mesma função que pinta o botão, então a regra dos pais (§4.4) vive
+   * num lugar só.
+   */
+  const destravarNo = useCallback(
+    async (noId: string) => {
+      if (!noDisponivel(dados.eventos, noId)) return;
+      const dia = hoje();
+
+      await otimista(
+        { ...dados, eventos: { ...dados.eventos, nos: [...dados.eventos.nos, { no: noId, dia }] } },
+        () => supabase.from("node_unlock").insert({ no_id: noId, destravado_em: dia }),
+      );
+    },
+    [dados, otimista, supabase],
+  );
+
   return {
     dados,
     eventos: dados.eventos,
@@ -153,6 +173,7 @@ function useEstadoInterno(iniciais: Dados): Contexto {
     registrarCheckin,
     registrarSessao,
     removerSessao,
+    destravarNo,
   };
 }
 
