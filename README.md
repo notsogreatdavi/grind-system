@@ -68,7 +68,7 @@ npm run dev
 | 1 · Supabase: schema, RLS, auth | ✅ |
 | 2 · Núcleo de domínio + testes | ✅ |
 | 3 · FICHA + check-in · **primeiro deploy** | ✅ |
-| 4 · GRID + Jornada do Vazio | ⬜ |
+| 4 · GRID + Jornada do Vazio | ✅ |
 | 5 · ÁRVORE de habilidades | ⬜ |
 | 6 · MISSÕES | ⬜ |
 | 7 · INVENTÁRIO | ⬜ |
