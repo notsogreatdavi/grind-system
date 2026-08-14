@@ -16,6 +16,7 @@ import {
   intervaloDeDias,
   multiplicadorStreak,
   nivelDisciplina,
+  noDisponivel,
   provaDeAmplitude,
   semanaPerfeita,
   somarDias,
@@ -231,6 +232,24 @@ test("nó destravado credita o XP do tier na disciplina dele", () => {
   const estado = derivarEstado(e, SEGUNDA);
   assert.equal(estado.xpPorDisciplina.MUS, 200);
   assert.equal(estado.xpPorDisciplina.CMP, 0);
+});
+
+/**
+ * A regra 4 da §4.4 — nó só destrava com todos os pais destravados — fica sem teste
+ * enquanto `NOS` só tiver tier 1. Não há nó com pai para exercitar, e um fixture
+ * inventado testaria o fixture, não a spec.
+ */
+test("nó de tier 1 está disponível desde o primeiro dia", () => {
+  assert.equal(noDisponivel(eventos(), "cor-barra"), true);
+});
+
+test("nó já destravado deixa de estar disponível", () => {
+  const e = eventos({ nos: [{ no: "cor-barra", dia: SEGUNDA }] });
+  assert.equal(noDisponivel(e, "cor-barra"), false);
+});
+
+test("id que não existe na spec não está disponível", () => {
+  assert.equal(noDisponivel(eventos(), "nao-existe"), false);
 });
 
 test("toda disciplina existe no estado, mesmo sem nenhum evento", () => {
