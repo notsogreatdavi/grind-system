@@ -86,12 +86,20 @@ function useEstadoInterno(iniciais: Dados): Contexto {
       await otimista({ ...dados, eventos: { ...eventos, pulsos } }, () =>
         marcado
           ? supabase.from("pulse_log").delete().eq("dia", dia).eq("pulso", pulso)
-          : supabase.from("pulse_log").insert({ dia, pulso, disciplina }),
+          : supabase
+              .from("pulse_log")
+              .upsert({ dia, pulso, disciplina }, { onConflict: "user_id,dia,pulso", ignoreDuplicates: true }),
       );
     },
     [dados, otimista, supabase],
   );
 
+  /**
+   * A guarda local é só atalho de rede: ela enxerga o snapshot carregado quando a
+   * página abriu, e o celular pode ter gravado o check-in de hoje depois disso. Quem
+   * decide de verdade é a constraint do banco, e conflito aqui significa "já tem
+   * check-in hoje" — que é o resultado desejado, não uma falha.
+   */
   const registrarCheckin = useCallback(
     async (dia: Dia = hoje()) => {
       const { eventos } = dados;
@@ -99,7 +107,10 @@ function useEstadoInterno(iniciais: Dados): Contexto {
 
       await otimista(
         { ...dados, eventos: { ...eventos, checkins: [...eventos.checkins, { dia }] } },
-        () => supabase.from("checkin_log").insert({ dia }),
+        () =>
+          supabase
+            .from("checkin_log")
+            .upsert({ dia }, { onConflict: "user_id,dia", ignoreDuplicates: true }),
       );
     },
     [dados, otimista, supabase],
@@ -157,7 +168,10 @@ function useEstadoInterno(iniciais: Dados): Contexto {
 
       await otimista(
         { ...dados, eventos: { ...dados.eventos, nos: [...dados.eventos.nos, { no: noId, dia }] } },
-        () => supabase.from("node_unlock").insert({ no_id: noId, destravado_em: dia }),
+        () =>
+          supabase
+            .from("node_unlock")
+            .upsert({ no_id: noId, destravado_em: dia }, { onConflict: "user_id,no_id", ignoreDuplicates: true }),
       );
     },
     [dados, otimista, supabase],
