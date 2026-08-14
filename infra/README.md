@@ -43,6 +43,12 @@ systemctl --user enable --now grind-notify@{checkin,risco,teto,marco-vazio,fecha
 
 No celular, instale o app do ntfy e assine o tópico de `NTFY_TOPIC`.
 
+## Por que as unidades moram aqui, e não no repositório de dotfiles
+
+Elas só fazem sentido junto da rota que chamam: numa máquina sem o GRIND clonado, não
+haveria o que notificar. Versionar nos dois lugares criaria dois arquivos que precisam
+ser editados juntos — e que uma hora divergem.
+
 ## Conferir
 
 ```bash
