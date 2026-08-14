@@ -1,0 +1,11 @@
+[Unit]
+Description=GRIND · Dia ainda vazio
+
+[Timer]
+OnCalendar=*-*-* 21:00:00
+# Dispara depois de um boot que perdeu o horário: o aviso atrasado ainda serve.
+Persistent=true
+Unit=grind-notify@risco.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=GRIND · Fechamento da semana
+
+[Timer]
+OnCalendar=Sun *-*-* 20:00:00
+# Dispara depois de um boot que perdeu o horário: o aviso atrasado ainda serve.
+Persistent=true
+Unit=grind-notify@fechamento.service
+
+[Install]
+WantedBy=timers.target

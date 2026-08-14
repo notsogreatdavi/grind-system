@@ -1,0 +1,16 @@
+[Unit]
+Description=GRIND · dispara a notificação %i
+Documentation=https://github.com/notsogreatdavi/grind-system
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Segredo fora do repositório, modo 600. Ver infra/notify.env.template.
+EnvironmentFile=%h/.config/grind/notify.env
+ExecStart=/usr/bin/curl --fail --silent --show-error \
+  --max-time 30 \
+  --header "x-grind-secret: ${GRIND_NOTIFY_SECRET}" \
+  --header "Content-Type: application/json" \
+  --data '{"gatilho":"%i"}' \
+  ${GRIND_URL}/api/notify

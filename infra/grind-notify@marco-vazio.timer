@@ -1,0 +1,11 @@
+[Unit]
+Description=GRIND · Marco do Vazio
+
+[Timer]
+OnCalendar=*-*-* 21:05:00
+# Dispara depois de um boot que perdeu o horário: o aviso atrasado ainda serve.
+Persistent=true
+Unit=grind-notify@marco-vazio.service
+
+[Install]
+WantedBy=timers.target

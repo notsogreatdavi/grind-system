@@ -1,0 +1,11 @@
+[Unit]
+Description=GRIND · Grid do dia
+
+[Timer]
+OnCalendar=*-*-* 08:00:00
+# Dispara depois de um boot que perdeu o horário: o aviso atrasado ainda serve.
+Persistent=true
+Unit=grind-notify@checkin.service
+
+[Install]
+WantedBy=timers.target
