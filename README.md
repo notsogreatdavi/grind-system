@@ -4,6 +4,8 @@
 habilidade e recompensas num lugar só — com a matemática toda derivada de eventos, nunca
 armazenada como saldo.
 
+[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-6BA3E8?style=flat-square)](LICENSE)
+
 `Next.js 16` · `React 19` · `Tailwind v4` · `Supabase` · `ntfy` · 31 testes · 5 dependências
 
 ![A aba FICHA: faixa de check-in dos seis Pulsos, classe e rank com barra de XP, e as seis
@@ -222,6 +224,9 @@ Layout rígido, movimento fluido: a estrutura não se mexe, o estado transiciona
 Sistema de um usuário só, construído para uso próprio. Não há multi-tenancy, convite,
 onboarding nem configuração — e a ausência é deliberada: cada uma dessas coisas custaria
 tempo que não melhora o único uso que existe.
+
+O código é [MIT](LICENSE): as **regras** são livres para copiar, adaptar e rodar. Os
+registros não estão aqui para serem licenciados.
 
 Este repositório carrega **o sistema**, nunca os registros. As metas, os números e o
 histórico de quem o usa vivem no banco, que é privado. As referências `§` nos comentários

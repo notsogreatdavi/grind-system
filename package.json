@@ -1,6 +1,7 @@
 {
   "name": "31.02_grind-system",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
