@@ -69,7 +69,7 @@ npm run dev
 | 2 · Núcleo de domínio + testes | ✅ |
 | 3 · FICHA + check-in · **primeiro deploy** | ✅ |
 | 4 · GRID + Jornada do Vazio | ✅ |
-| 5 · ÁRVORE de habilidades | ⬜ |
+| 5 · ÁRVORE de habilidades | ✅ |
 | 6 · MISSÕES | ⬜ |
 | 7 · INVENTÁRIO | ⬜ |
 | 8 · Notificações ntfy + systemd | ⬜ |
