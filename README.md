@@ -71,6 +71,6 @@ npm run dev
 | 4 · GRID + Jornada do Vazio | ✅ |
 | 5 · ÁRVORE de habilidades | ✅ |
 | 6 · MISSÕES | ✅ |
-| 7 · INVENTÁRIO | ⬜ |
+| 7 · INVENTÁRIO | ✅ |
 | 8 · Notificações ntfy + systemd | ⬜ |
 | 9 · Fechamento | ⬜ |
