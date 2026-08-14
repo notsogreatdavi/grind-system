@@ -10,6 +10,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  creditosDeRecompensa,
   derivarEstado,
   distribuicaoDoPulso,
   ganhosDoDia,
@@ -232,6 +233,51 @@ test("nó destravado credita o XP do tier na disciplina dele", () => {
   const estado = derivarEstado(e, SEGUNDA);
   assert.equal(estado.xpPorDisciplina.MUS, 200);
   assert.equal(estado.xpPorDisciplina.CMP, 0);
+});
+
+test("três dias seguidos pagam uma recompensa Micro; nove pagam três", () => {
+  const tres = intervaloDeDias(SEGUNDA, "2100-01-01").slice(0, 3);
+  const nove = intervaloDeDias(SEGUNDA, "2100-01-01").slice(0, 9);
+
+  const com = (dias: string[]) => eventos({ checkins: dias.map((dia) => ({ dia })) });
+
+  assert.equal(creditosDeRecompensa(com(tres), tres[2]).micro, 1);
+  assert.equal(creditosDeRecompensa(com(nove), nove[8]).micro, 3);
+});
+
+test("dia vazio no meio zera o bloco de três dias", () => {
+  const dias = intervaloDeDias(SEGUNDA, "2100-01-01").slice(0, 5);
+  const semQuarta = dias.filter((_, i) => i !== 2);
+  const e = eventos({ checkins: semQuarta.map((dia) => ({ dia })) });
+
+  assert.equal(creditosDeRecompensa(e, dias[4]).micro, 0);
+});
+
+test("uma semana perfeita paga uma Pequena, e duas pagam também uma Média", () => {
+  const uma = eventos(semanaCheia(SEGUNDA));
+  const fim = somarDias(SEGUNDA, 6);
+  assert.equal(creditosDeRecompensa(uma, fim).pequena, 1);
+  assert.equal(creditosDeRecompensa(uma, fim).media, 0);
+
+  const proxima = somarDias(SEGUNDA, 7);
+  const primeira = semanaCheia(SEGUNDA);
+  const segunda = semanaCheia(proxima);
+  const duas = eventos({
+    checkins: [...primeira.checkins, ...segunda.checkins],
+    pulsos: [...primeira.pulsos, ...segunda.pulsos],
+    missoes: [...primeira.missoes, ...segunda.missoes],
+  });
+
+  const fimDaSegunda = somarDias(proxima, 6);
+  assert.equal(creditosDeRecompensa(duas, fimDaSegunda).pequena, 2);
+  assert.equal(creditosDeRecompensa(duas, fimDaSegunda).media, 1);
+});
+
+test("avanço de classe paga uma recompensa Grande", () => {
+  const e = eventos({
+    missoes: [{ id: "av", tipo: "avanco" as const, dia: somarDias(SEGUNDA, 1) }],
+  });
+  assert.equal(creditosDeRecompensa(e, somarDias(SEGUNDA, 1)).grande, 1);
 });
 
 /**
